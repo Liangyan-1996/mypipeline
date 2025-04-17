@@ -1,4 +1,4 @@
-# my bioinifomatic pipeline
+# my bioinfomatic pipeline
 
 ```
 mypipeline
