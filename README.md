@@ -1,6 +1,7 @@
 # my bioinfomatic pipeline
 
 ```
+$ tree mypipeline
 mypipeline
 ├── ATAC-seq
 │   ├── ATACseq_human.sh
@@ -8,11 +9,13 @@ mypipeline
 ├── cellranger
 │   └── scRNAseq_10X.sh
 ├── ChIP-seq
-│   └── ChIPseq_human.sh
+│   ├── ChIPseq_human.sh
+│   └── z.sh
 ├── CUTTag
 │   ├── runCUTRUN.sh
 │   ├── runCUTTag.sh
-│   └── z.sh
+│   ├── z_cutrun.sh
+│   ├── z_cuttag.sh
 ├── RNAseq
 │   ├── RNA-seq_McSplicer
 │   │   └── runRNAseq_human.sh
@@ -20,7 +23,6 @@ mypipeline
 │   │   └── runRNAseq_human.sh
 │   ├── runRNAseq_human.sh
 │   ├── runRNAseq_human.TotolPipeline.sbatch
-│   ├── script
 │   └── z.sh
 └── script
     ├── ATACseq
