@@ -55,16 +55,18 @@ echo 'Error! There is no raw data'
 fi
 
 cd mapping
+# sorting
 $sambamba sort -m 10G -t $thread $sample.bam
-$sambamba markdup \
-    -r -t ${thread} ${sample}.sorted.bam ${sample}.dedup.bam 2>> $workdir/log/${sample}.log
-# -r remove duplicates instead of marking them only, -t threads
-$bedtools intersect \
-    -nonamecheck -v -a ${sample}.dedup.bam -b $blacklist > ${sample}.rmblacklist.bam
+# remove PCR duplicates
+$sambamba markdup -r -t ${thread} ${sample}.sorted.bam ${sample}.dedup.bam 2>> $workdir/log/${sample}.log
+# remove blacklist reads
+$bedtools intersect -nonamecheck -v -a ${sample}.dedup.bam -b $blacklist > ${sample}.rmblacklist.bam
+# final sorting
 $sambamba sort -m 10G -t ${thread} -o ${sample}.clean.bam ${sample}.rmblacklist.bam
+# coverage
 $bamCoverage \
     -b ${sample}.clean.bam -o ${sample}.bw -p ${thread} \
     --binSize 50 --normalizeUsing RPGC \
     --effectiveGenomeSize $GenomeSize --extendReads 100
+# remove tmp
 rm ${sample}.bam* ${sample}.sorted.bam* ${sample}.dedup.bam* ${sample}.rmblacklist.bam*
-
