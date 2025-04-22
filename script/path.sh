@@ -10,10 +10,10 @@ alignmentSieve="/public/home/liunangroup/liangyan/software/miniconda3/bin/alignm
 computeMatrix="/public/home/liunangroup/liangyan/software/miniconda3/bin/computeMatrix"
 plotHeatmap="/public/home/liunangroup/liangyan/software/miniconda3/bin/plotHeatmap"
 bamCoverage="/public/home/liunangroup/liangyan/software/miniconda3/bin/bamCoverage"
-scriptpath="/public/home/liunangroup/liangyan/pipeline/mypipeline/script"
+ScriptDir="/public/home/liunangroup/liangyan/pipeline/mypipeline/script"
 
 # -----for epi-genomic sequencing-----
-Rscript="/public/home/liunangroup/liangyan/software/miniconda3/envs/ATAC/bin/Rscript"
+epigenomics_Rscript="/public/home/liunangroup/liangyan/software/miniconda3/envs/ATAC/bin/Rscript"
 bowtie2index="/public/home/liunangroup/liangyan/Genome/gencode/hg38/bowtie2_index/genome"
 blacklist="/public/home/liunangroup/liangyan/pipeline/CUT-RUNTools-2.0/blacklist/hg38.blacklist.bed"
 TSS="/public/home/liunangroup/liangyan/Genome/gencode/hg38/hg38.TSS.bed"
@@ -24,6 +24,7 @@ ucsc_anno="TxDb.Hsapiens.UCSC.hg38.knownGene"
 # -----for RNA sequencing-----
 STAR_index="/public/home/liunangroup/liangyan/Genome/ensembl/hg38/STAR_index"
 GTF="/public/home/liunangroup/liangyan/Genome/ensembl/hg38/Homo_sapiens.GRCh38.110.chr.gtf"
+transcriptomics_Rscript="/public/home/liunangroup/liangyan/software/miniconda3/envs/deseq2/bin/Rscript"
 
 # -----for 10X single cell RNA sequencing-----
 cellranger="/public/home/liunangroup/liangyan/software/cellranger-9.0.0/cellranger"
