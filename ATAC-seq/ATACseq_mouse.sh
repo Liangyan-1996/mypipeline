@@ -11,12 +11,12 @@ bamCoverage="/public/home/liunangroup/liangyan/software/miniconda3/bin/bamCovera
 ScriptDir="/public/home/liunangroup/liangyan/pipeline/mypipeline/script"
 Rscript="/public/home/liunangroup/liangyan/software/miniconda3/envs/ATAC/bin/Rscript"
 
-bowtie2index="/public/home/liunangroup/liangyan/Genome/gencode/hg38/bowtie2_index/genome"
-blacklist="/public/home/liunangroup/liangyan/pipeline/CUT-RUNTools-2.0/blacklist/hg38.blacklist.bed"
-GenomeSize="2913022398"
-specie="hs"
-ucsc_anno="TxDb.Hsapiens.UCSC.hg38.knownGene"
-TSS="/public/home/liunangroup/liangyan/Genome/gencode/hg38/hg38.TSS.bed"
+bowtie2index="/public/home/liunangroup/liangyan/Genome/gencode/mm10/bowtie2_index/genome"
+blacklist="/public/home/liunangroup/liangyan/pipeline/CUT-RUNTools-2.0/blacklist/mm10.blacklist.bed"
+GenomeSize="2652783500"
+specie="mm"
+ucsc_anno="TxDb.Hsapiens.UCSC.mm10.knownGene"
+TSS="/public/home/liunangroup/liangyan/Genome/gencode/mm10/mm10.TSS.bed"
 
 sample="$1"
 thread="$2"

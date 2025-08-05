@@ -7,9 +7,13 @@ sambamba="/public/home/liunangroup/liangyan/software/miniconda3/envs/chipseq/bin
 bedtools="/public/home/liunangroup/liangyan/software/miniconda3/envs/chipseq/bin/bedtools"
 macs2="/public/home/liunangroup/liangyan/software/miniconda3/envs/chipseq/bin/macs2"
 bamCoverage="/public/home/liunangroup/liangyan/software/miniconda3/bin/bamCoverage"
-ScriptDir="/public/home/liunangroup/liangyan/pipeline/mypipeline/script"
+computeMatrix="/public/home/liunangroup/liangyan/software/miniconda3/bin/computeMatrix"
+plotHeatmap="/public/home/liunangroup/liangyan/software/miniconda3/bin/plotHeatmap"
+Rscript="/public/home/liunangroup/liangyan/software/miniconda3/envs/ATAC/bin/Rscript"
+scriptdir="/public/home/liunangroup/liangyan/pipeline/mypipeline/script"
 bowtie2index="/public/home/liunangroup/liangyan/Genome/gencode/hg38/bowtie2_index/genome"
 blacklist="/public/home/liunangroup/liangyan/pipeline/CUT-RUNTools-2.0/blacklist/hg38.blacklist.bed"
+homer="/public/home/liunangroup/liangyan/software/homer/bin/findMotifsGenome.pl"
 GenomeSize="2913022398"
 specie="hs"
 
@@ -20,8 +24,9 @@ workdir=`pwd`
 cd $workdir
 mkdir qc
 mkdir mapping
-mkdir logs
-mkdir peak
+mkdir log
+mkdir peak_narrow peak_broad
+mkdir motif
 # qc
 $fastp \
     -i raw/${sample}_1.fastq.gz -I raw/${sample}_2.fastq.gz \
@@ -38,7 +43,7 @@ $bowtie2 \
 cd mapping
 # sorting
 $sambamba sort -t $thread -m 10G ${sample}.bam
-# remove duplicates
+# remove PCR duplicates
 $sambamba markdup -r -t ${thread} ${sample}.sorted.bam ${sample}.dedup.bam 2>> $workdir/log/${sample}.log
 # remove blacklist reads
 $bedtools intersect -nonamecheck -v -a ${sample}.dedup.bam -b $blacklist > ${sample}.rmblack.bam
@@ -51,7 +56,7 @@ $sambamba sort -t $thread -m 10G -o $sample.clean.bam $sample.shift.bam
 $bamCoverage \
     -b ${sample}.clean.bam -o ${sample}.bw -p ${thread} \
     --binSize 50 --normalizeUsing RPGC \
-    --effectiveGenomeSize ${genomesize}
+    --effectiveGenomeSize $GenomeSize
 # log
 line_align=`$samtools view -@ $thread -c ${sample}.sorted.bam`
 line_MT=`$samtools view -@ $thread -c ${sample}.sorted.bam chrM`
@@ -59,18 +64,44 @@ MT_pct=`echo -e "scale=5;${line_MT} / ${line_align} * 100"|bc`
 echo -e "MT proportion: ${MT_pct}%" >> $workdir/log/${sample}.log
 # remove tmp
 rm ${sample}.sorted.bam* ${sample}.bam* ${sample}.dedup.bam* ${sample}.rmblack.bam* ${sample}.shift.bam*
-# length distribution
-$samtools view $sample.clean.bam |\
-    awk -F'\t' 'function abs(x){return ((x < 0.0) ? -x : x)} {print $1"\t"abs($9)}' |\
-    sort | uniq | cut -f2 > ${sample}.length.txt
-$Rscript $ScriptDir/CUTTag/frag_len.R ${sample}.length.txt ${sample}.length.png
+
 # peak calling
 $macs2 callpeak \
     -t ${sample}.clean.bam -f BAMPE --gsize $specie \
-    -n ${sample}_narrow -q 0.01 --keep-dup all \
-    --outdir ${workdir}/peak; 2>> ${workdir}/logs/$sample.log
+    -n ${sample} -q 0.01 --keep-dup all \
+    --outdir ${workdir}/peak_narrow; 2>> ${workdir}/log/$sample.log
 $macs2 callpeak \
     -t ${sample}.clean.bam -f BAMPE --gsize $specie \
-    -n ${sample}_broad -q 0.01 --keep-dup all \
+    -n ${sample} -q 0.01 --keep-dup all \
     --broad --broad-cutoff 0.05 \
-    --outdir ${workdir}/peak; 2>> ${workdir}/logs/$sample.log
+    --outdir ${workdir}/peak_broad; 2>> ${workdir}/log/$sample.log
+
+# motif enrichment
+$homer ${workdir}/peak_narrow/${sample}_summits.bed hg38 ${workdir}/motif/$sample -size -100,100 -p $thread
+
+# post qc
+# length distribution
+$samtools view ${workdir}/mapping/${sample}.clean.bam |\
+    awk -F'\t' 'function abs(x){return ((x < 0.0) ? -x : x)} {print $1"\t"abs($9)}' |\
+    sort | uniq | cut -f2 > ${workdir}/mapping/${sample}.length.txt
+$Rscript $scriptdir/CUTTag/frag_len.R ${workdir}/mapping/${sample}.length.txt ${workdir}/mapping/${sample}.length.png
+
+# heatmap
+$computeMatrix reference-point \
+    -S ${workdir}/mapping/${sample}.bw \
+    -R ${workdir}/peak_narrow/${sample}_summits.bed \
+    -o ${workdir}/mapping/${sample}.gz \
+    -a 3000 -b 3000 -p ${thread}
+$plotHeatmap \
+    --matrixFile ${workdir}/mapping/${sample}.gz \
+    -out ${workdir}/mapping/${sample}.png \
+    --dpi 300 --plotFileFormat png --yMin 0
+
+# FRiP
+line_clean=`$samtools view -c $workdir/mapping/${sample}.clean.bam`
+line_inPeak=`$bedtools sort -i $workdir/peak_narrow/${sample}_peaks.narrowPeak |\
+    $bedtools intersect -u -nonamecheck -a $workdir/mapping/${sample}.clean.bam -b stdin -ubam |\
+    $samtools view -c -@ ${thread}`
+FRiP=`echo -e "scale=5;${line_inPeak} / ${line_clean}"|bc`
+echo -e "Clean Fragments: ${line_clean}" >> $workdir/log/${sample}.log
+echo -e "FRiP: $FRiP" >> $workdir/log/${sample}.log

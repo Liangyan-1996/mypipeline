@@ -5,7 +5,7 @@ STAR="/public/home/liunangroup/liangyan/software/miniconda3/envs/rnaseq/bin/STAR
 samtools="/public/home/liunangroup/liangyan/software/miniconda3/bin/samtools"
 stringtie="/public/home/liunangroup/liangyan/software/miniconda3/envs/rnaseq/bin/stringtie"
 bamCoverage="/public/home/liunangroup/liangyan/software/miniconda3/bin/bamCoverage"
-mergeTPM="/public/home/liunangroup/liangyan/pipeline/RNAseq/script/mergeTPM"
+mergeTPM="/public/home/liunangroup/liangyan/pipeline/mypipeline/script/RNAseq/mergeTPM"
 
 STAR_index="/public/home/liunangroup/liangyan/Genome/ensembl/hg38/STAR_index"
 GTF="/public/home/liunangroup/liangyan/Genome/ensembl/hg38/Homo_sapiens.GRCh38.110.chr.gtf"

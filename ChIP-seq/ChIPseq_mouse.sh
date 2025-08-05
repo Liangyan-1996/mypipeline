@@ -8,9 +8,9 @@ bedtools="/public/home/liunangroup/liangyan/software/miniconda3/envs/chipseq/bin
 macs2="/public/home/liunangroup/liangyan/software/miniconda3/envs/chipseq/bin/macs2"
 bamCoverage="/public/home/liunangroup/liangyan/software/miniconda3/bin/bamCoverage"
 
-bowtie2index="/public/home/liunangroup/liangyan/Genome/gencode/hg38/bowtie2_index/genome"
-blacklist="/public/home/liunangroup/liangyan/pipeline/CUT-RUNTools-2.0/blacklist/hg38.blacklist.bed"
-GenomeSize="2913022398"
+bowtie2index="/public/home/liunangroup/liangyan/Genome/gencode/mm10/bowtie2_index/genome"
+blacklist="/public/home/liunangroup/liangyan/pipeline/CUT-RUNTools-2.0/blacklist/mm10.blacklist.bed"
+GenomeSize="2652783500"
 
 sample="$1"
 thread="$2"
@@ -64,9 +64,9 @@ $bedtools intersect -nonamecheck -v -a ${sample}.dedup.bam -b $blacklist > ${sam
 # final sorting
 $sambamba sort -m 10G -t ${thread} -o ${sample}.clean.bam ${sample}.rmblacklist.bam
 # coverage
-$bamCoverage \
-    -b ${sample}.clean.bam -o ${sample}.bw -p ${thread} \
-    --binSize 50 --normalizeUsing RPGC \
-    --effectiveGenomeSize $GenomeSize --extendReads 100
+#$bamCoverage \
+#    -b ${sample}.clean.bam -o ${sample}.bw -p ${thread} \
+#    --binSize 50 --normalizeUsing RPGC \
+#    --effectiveGenomeSize $GenomeSize --extendReads 100
 # remove tmp
-# rm ${sample}.bam* ${sample}.sorted.bam* ${sample}.dedup.bam* ${sample}.rmblacklist.bam*
+rm ${sample}.bam* ${sample}.sorted.bam* ${sample}.dedup.bam* ${sample}.rmblacklist.bam*
